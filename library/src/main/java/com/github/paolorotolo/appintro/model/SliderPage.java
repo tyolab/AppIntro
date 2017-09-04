@@ -12,7 +12,7 @@ public class SliderPage {
     private CharSequence title;
     private CharSequence description;
     @DrawableRes
-    private int imageDrawable;
+    private int imageDrawable = -1;
     @ColorInt
     private int bgColor;
     @ColorInt
@@ -21,6 +21,7 @@ public class SliderPage {
     private int descColor;
     private String titleTypeface;
     private String descTypeface;
+    private String drawableAsset;
 
     public CharSequence getTitle() {
         return title;
@@ -92,5 +93,13 @@ public class SliderPage {
 
     public void setTitleTypeface(final String titleTypeface) {
         this.titleTypeface = titleTypeface;
+    }
+
+    public String getDrawableAsset() {
+        return drawableAsset;
+    }
+
+    public void setDrawableAsset(String drawableAsset) {
+        this.drawableAsset = drawableAsset;
     }
 }

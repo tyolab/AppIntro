@@ -15,21 +15,25 @@ import android.widget.TextView;
 import com.github.paolorotolo.appintro.util.CustomFontCache;
 import com.github.paolorotolo.appintro.util.LogHelper;
 
+import au.com.tyo.android.utils.AssetsUtils;
+
 public abstract class AppIntroBaseFragment extends Fragment implements ISlideSelectionListener,
         ISlideBackgroundColorHolder {
     protected static final String ARG_TITLE = "title";
     protected static final String ARG_TITLE_TYPEFACE = "title_typeface";
     protected static final String ARG_DESC = "desc";
     protected static final String ARG_DESC_TYPEFACE = "desc_typeface";
-    protected static final String ARG_DRAWABLE = "drawable";
+    protected static final String ARG_DRAWABLE_RESOURCE = "drawable_resource";
+    protected static final String ARG_DRAWABLE_ASSET = "drawable_asset";
     protected static final String ARG_BG_COLOR = "bg_color";
     protected static final String ARG_TITLE_COLOR = "title_color";
     protected static final String ARG_DESC_COLOR = "desc_color";
 
     private static final String TAG = LogHelper.makeLogTag(AppIntroBaseFragment.class);
 
-    private int drawable, bgColor, titleColor, descColor, layoutId;
+    private int drawableResId, bgColor, titleColor, descColor, layoutId;
     private String title, titleTypeface, description, descTypeface;
+    private String drawableAssetFile;
 
     private LinearLayout mainLayout;
 
@@ -40,7 +44,7 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
         setRetainInstance(true);
 
         if (getArguments() != null && getArguments().size() != 0) {
-            drawable = getArguments().getInt(ARG_DRAWABLE);
+            drawableResId = getArguments().getInt(ARG_DRAWABLE_RESOURCE);
             title = getArguments().getString(ARG_TITLE);
             titleTypeface = getArguments().containsKey(ARG_TITLE_TYPEFACE) ?
                     getArguments().getString(ARG_TITLE_TYPEFACE) : "";
@@ -52,6 +56,8 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
                     getArguments().getInt(ARG_TITLE_COLOR) : 0;
             descColor = getArguments().containsKey(ARG_DESC_COLOR) ?
                     getArguments().getInt(ARG_DESC_COLOR) : 0;
+
+            drawableAssetFile = getArguments().getString(ARG_DRAWABLE_ASSET);
         }
     }
 
@@ -60,7 +66,7 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            drawable = savedInstanceState.getInt(ARG_DRAWABLE);
+            drawableResId = savedInstanceState.getInt(ARG_DRAWABLE_RESOURCE);
             title = savedInstanceState.getString(ARG_TITLE);
             titleTypeface = savedInstanceState.getString(ARG_TITLE_TYPEFACE);
             description = savedInstanceState.getString(ARG_DESC);
@@ -68,6 +74,8 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
             bgColor = savedInstanceState.getInt(ARG_BG_COLOR);
             titleColor = savedInstanceState.getInt(ARG_TITLE_COLOR);
             descColor = savedInstanceState.getInt(ARG_DESC_COLOR);
+
+            drawableAssetFile = savedInstanceState.getString(ARG_DRAWABLE_ASSET);
         }
     }
 
@@ -100,7 +108,11 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
                 d.setTypeface(CustomFontCache.get(descTypeface, getContext()));
             }
         }
-        i.setImageResource(drawable);
+
+        if (drawableResId > 0)
+            i.setImageResource(drawableResId);
+        else
+            i.setImageDrawable(AssetsUtils.getDrawable(getContext(), drawableAssetFile));
         mainLayout.setBackgroundColor(bgColor);
 
         return v;
@@ -108,7 +120,7 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(ARG_DRAWABLE, drawable);
+        outState.putInt(ARG_DRAWABLE_RESOURCE, drawableResId);
         outState.putString(ARG_TITLE, title);
         outState.putString(ARG_DESC, description);
         outState.putInt(ARG_BG_COLOR, bgColor);

@@ -20,7 +20,7 @@ public final class AppIntro2Fragment extends AppIntroBaseFragment {
         args.putString(ARG_TITLE_TYPEFACE, null);
         args.putString(ARG_DESC, description.toString());
         args.putString(ARG_DESC_TYPEFACE, null);
-        args.putInt(ARG_DRAWABLE, imageDrawable);
+        args.putInt(ARG_DRAWABLE_RESOURCE, imageDrawable);
         args.putInt(ARG_BG_COLOR, bgColor);
         args.putInt(ARG_TITLE_COLOR, titleColor);
         args.putInt(ARG_DESC_COLOR, descColor);
@@ -47,7 +47,7 @@ public final class AppIntro2Fragment extends AppIntroBaseFragment {
         args.putString(ARG_TITLE_TYPEFACE, titleTypeface);
         args.putString(ARG_DESC, description.toString());
         args.putString(ARG_DESC_TYPEFACE, descTypeface);
-        args.putInt(ARG_DRAWABLE, imageDrawable);
+        args.putInt(ARG_DRAWABLE_RESOURCE, imageDrawable);
         args.putInt(ARG_BG_COLOR, bgColor);
         args.putInt(ARG_TITLE_COLOR, titleColor);
         args.putInt(ARG_DESC_COLOR, descColor);

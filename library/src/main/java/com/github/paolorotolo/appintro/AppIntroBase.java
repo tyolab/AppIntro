@@ -11,13 +11,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -29,13 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import au.com.tyo.app.CommonActivity;
+
 import static com.github.paolorotolo.appintro.ViewPageTransformer.TransformType.DEPTH;
 import static com.github.paolorotolo.appintro.ViewPageTransformer.TransformType.FADE;
 import static com.github.paolorotolo.appintro.ViewPageTransformer.TransformType.FLOW;
 import static com.github.paolorotolo.appintro.ViewPageTransformer.TransformType.SLIDE_OVER;
 import static com.github.paolorotolo.appintro.ViewPageTransformer.TransformType.ZOOM;
 
-public abstract class AppIntroBase extends AppCompatActivity implements
+public abstract class AppIntroBase extends CommonActivity implements
         AppIntroViewPager.OnNextPageRequestedListener {
 
     public static final int DEFAULT_COLOR = 1;
@@ -81,11 +81,20 @@ public abstract class AppIntroBase extends AppCompatActivity implements
     private int currentlySelectedItem = -1;
 
     @Override
+    protected void onPageCreated() {
+        getPage().setContentViewResId(getLayoutId());
+
+        super.onPageCreated();
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragments);
+
         super.onCreate(savedInstanceState);
 
-        setContentView(getLayoutId());
+        // setContentView(getLayoutId());
 
         gestureDetector = new GestureDetectorCompat(this, new WindowGestureListener());
 
@@ -110,7 +119,6 @@ public abstract class AppIntroBase extends AppCompatActivity implements
         }
 
         mVibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragments);
         pager = (AppIntroViewPager) findViewById(R.id.view_pager);
 
         if (doneButton != null) {
