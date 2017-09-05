@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.paolorotolo.appintro.util.CustomFontCache;
@@ -35,7 +34,7 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
     private String title, titleTypeface, description, descTypeface;
     private String drawableAssetFile;
 
-    private LinearLayout mainLayout;
+    private View mainLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,7 +87,7 @@ public abstract class AppIntroBaseFragment extends Fragment implements ISlideSel
         TextView t = (TextView) v.findViewById(R.id.title);
         TextView d = (TextView) v.findViewById(R.id.description);
         ImageView i = (ImageView) v.findViewById(R.id.image);
-        mainLayout = (LinearLayout) v.findViewById(R.id.main);
+        mainLayout = v.findViewById(R.id.main);
 
         t.setText(title);
         if (titleColor != 0) {

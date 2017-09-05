@@ -1000,14 +1000,26 @@ public abstract class AppIntroBase extends CommonActivity implements
 
     public class PagerOnPageChangeListener implements ViewPager.OnPageChangeListener {
 
+        private float sumPositionAndPositionOffset = 0;
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if (areColorTransitionsEnabled) {
                 if (position < mPagerAdapter.getCount() - 1) {
-                    if (mPagerAdapter.getItem(position) instanceof ISlideBackgroundColorHolder &&
-                            mPagerAdapter.getItem(position + 1) instanceof ISlideBackgroundColorHolder) {
+                        boolean isSwipeToLeft = (position + positionOffset) > sumPositionAndPositionOffset;
+                        sumPositionAndPositionOffset = position + positionOffset;
                         Fragment currentSlide = mPagerAdapter.getItem(position);
-                        Fragment nextSlide = mPagerAdapter.getItem(position + 1);
+                        Fragment nextSlide = null;
+                        if (isSwipeToLeft && position > 0) {
+                            nextSlide = mPagerAdapter.getItem(position - 1);
+                        }
+                        else {
+                            nextSlide = mPagerAdapter.getItem(position + 1);
+                        }
+
+                        if (!(mPagerAdapter.getItem(position) instanceof ISlideBackgroundColorHolder) ||
+                                !(mPagerAdapter.getItem(position + 1) instanceof ISlideBackgroundColorHolder))
+                            throw new IllegalStateException("Color transitions are only available if all slides implement ISlideBackgroundColorHolder.");
 
                         ISlideBackgroundColorHolder currentSlideCasted =
                                 (ISlideBackgroundColorHolder) currentSlide;
@@ -1017,16 +1029,16 @@ public abstract class AppIntroBase extends CommonActivity implements
                         // Check if both fragments are attached to an activity,
                         // otherwise getDefaultBackgroundColor may fail.
                         if (currentSlide.isAdded() && nextSlide.isAdded()) {
+                            int currentColor = currentSlideCasted.getDefaultBackgroundColor();
+                            int nextColor = nextSlideCasted.getDefaultBackgroundColor();
                             int newColor = (int) argbEvaluator.evaluate(positionOffset,
-                                    currentSlideCasted.getDefaultBackgroundColor(),
-                                    nextSlideCasted.getDefaultBackgroundColor());
+                                    currentColor,
+                                    nextColor);
 
                             currentSlideCasted.setBackgroundColor(newColor);
                             nextSlideCasted.setBackgroundColor(newColor);
+                            AppIntroBase.this.onPageTransiteWithColor(newColor);
                         }
-                    } else {
-                        throw new IllegalStateException("Color transitions are only available if all slides implement ISlideBackgroundColorHolder.");
-                    }
                 }
             }
         }
@@ -1066,6 +1078,13 @@ public abstract class AppIntroBase extends CommonActivity implements
         public void onPageScrollStateChanged(int state) {
 
         }
+    }
+
+    /**
+     *
+     * @param newColor
+     */
+    protected void onPageTransiteWithColor(int newColor) {
     }
 
     private final class WindowGestureListener extends GestureDetector.SimpleOnGestureListener {
