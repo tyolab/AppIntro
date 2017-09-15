@@ -1017,20 +1017,22 @@ public abstract class AppIntroBase extends CommonActivity implements
                         nextSlide = mPagerAdapter.getItem(position + 1);
                     }
 
+                    ISlideBackgroundColorHolder currentSlideCasted =
+                            (ISlideBackgroundColorHolder) currentSlide;
+                    int currentColor = currentSlideCasted.getDefaultBackgroundColor();
+
                     if (null != nextSlide) {
                         if (!(currentSlide instanceof ISlideBackgroundColorHolder) ||
                                 !(nextSlide instanceof ISlideBackgroundColorHolder))
                             throw new IllegalStateException("Color transitions are only available if all slides implement ISlideBackgroundColorHolder.");
 
-                        ISlideBackgroundColorHolder currentSlideCasted =
-                                (ISlideBackgroundColorHolder) currentSlide;
+
                         ISlideBackgroundColorHolder nextSlideCasted =
                                 (ISlideBackgroundColorHolder) nextSlide;
 
                         // Check if both fragments are attached to an activity,
                         // otherwise getDefaultBackgroundColor may fail.
                         if (currentSlide.isAdded() && nextSlide.isAdded()) {
-                            int currentColor = currentSlideCasted.getDefaultBackgroundColor();
                             int nextColor = nextSlideCasted.getDefaultBackgroundColor();
                             int newColor = (int) argbEvaluator.evaluate(positionOffset,
                                     currentColor,
@@ -1040,6 +1042,9 @@ public abstract class AppIntroBase extends CommonActivity implements
                             nextSlideCasted.setBackgroundColor(newColor);
                             AppIntroBase.this.onPageTransiteWithColor(newColor);
                         }
+                    }
+                    else {
+                        AppIntroBase.this.onPageTransiteWithColor(currentColor);
                     }
                // }
             }
