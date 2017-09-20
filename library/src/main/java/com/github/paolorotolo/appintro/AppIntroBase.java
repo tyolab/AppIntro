@@ -1000,39 +1000,57 @@ public abstract class AppIntroBase extends CommonActivity implements
 
     public class PagerOnPageChangeListener implements ViewPager.OnPageChangeListener {
 
-        private float sumPositionAndPositionOffset = 0;
+        private double sumPositionAndPositionOffset = 0;
+
+        private int lastState = -1;
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if (lastState == -1)
+                lastState = position;
+
+            int leftPosition = position; // (int) Math.ceil(position + positionOffset);
+            int rightPosition = (int) Math.ceil(position + positionOffset);
+            boolean isSwipeToLeft = (position + positionOffset) > lastState; // sumPositionAndPositionOffset;
+            sumPositionAndPositionOffset = position + positionOffset;
+
+            Log.d("AppIntroBase", "swipe " + (isSwipeToLeft ? "left" : "right"));
+            Log.d("AppIntroBase", "left position: " + leftPosition );
+            Log.d("AppIntroBase", "right position: " + rightPosition);
+            Log.d("AppIntroBase", "sum position: " + sumPositionAndPositionOffset);
+            Log.d("AppIntroBase", "last state: " + lastState);
+
+            Fragment leftSlide = mPagerAdapter.getItem(leftPosition);
+
             if (areColorTransitionsEnabled) {
-                Fragment currentSlide = mPagerAdapter.getItem(position);
                 //if (position < mPagerAdapter.getCount()) {
-                    boolean isSwipeToLeft = (position + positionOffset) > sumPositionAndPositionOffset;
-                    sumPositionAndPositionOffset = position + positionOffset;
-                    Fragment nextSlide = null;
-                    if (isSwipeToLeft && position > 0) {
-                        nextSlide = mPagerAdapter.getItem(position - 1);
-                    }
-                    else if (!isSwipeToLeft && position < (mPagerAdapter.getCount() - 1)){
-                        nextSlide = mPagerAdapter.getItem(position + 1);
-                    }
+
+                    Fragment rightSlide = null;
+                rightSlide = mPagerAdapter.getItem(rightPosition);
+//                    if (isSwipeToLeft) {
+//                        if (this.position < (mPagerAdapter.getCount() - 1))
+//                            rightSlide = mPagerAdapter.getItem(this.position + 1);
+//                    }
+//                    else {
+//                        if (this.position > 0)
+//                            rightSlide = mPagerAdapter.getItem(this.position - 1);
+//                    }
 
                     ISlideBackgroundColorHolder currentSlideCasted =
-                            (ISlideBackgroundColorHolder) currentSlide;
+                            (ISlideBackgroundColorHolder) leftSlide;
                     int currentColor = currentSlideCasted.getDefaultBackgroundColor();
 
-                    if (null != nextSlide) {
-                        if (!(currentSlide instanceof ISlideBackgroundColorHolder) ||
-                                !(nextSlide instanceof ISlideBackgroundColorHolder))
+                    if (null != rightSlide) {
+                        if (!(leftSlide instanceof ISlideBackgroundColorHolder) ||
+                                !(rightSlide instanceof ISlideBackgroundColorHolder))
                             throw new IllegalStateException("Color transitions are only available if all slides implement ISlideBackgroundColorHolder.");
 
-
                         ISlideBackgroundColorHolder nextSlideCasted =
-                                (ISlideBackgroundColorHolder) nextSlide;
+                                (ISlideBackgroundColorHolder) rightSlide;
 
                         // Check if both fragments are attached to an activity,
                         // otherwise getDefaultBackgroundColor may fail.
-                        if (currentSlide.isAdded() && nextSlide.isAdded()) {
+                        if (leftSlide.isAdded() && rightSlide.isAdded()) {
                             int nextColor = nextSlideCasted.getDefaultBackgroundColor();
                             int newColor = (int) argbEvaluator.evaluate(positionOffset,
                                     currentColor,
@@ -1083,8 +1101,13 @@ public abstract class AppIntroBase extends CommonActivity implements
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            int position = pager.getCurrentItem();
-            AppIntroBase.this.onPageStateChanged(position);
+//            int position = pager.getCurrentItem();
+//            AppIntroBase.this.onPageStateChanged(position);
+            if (lastState < state)
+                Log.d("AppIntroBase", "swipe2 " + "left");
+            else
+                Log.d("AppIntroBase", "swipe2 " + "right");
+            lastState = state;
         }
     }
 
